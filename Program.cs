@@ -1,8 +1,4 @@
 ﻿using AutoVinchik;
-using Microsoft.Extensions.Logging;
-using System.Linq;
-using System.Net.Mail;
-using System.Text.RegularExpressions;
 using VkNet;
 using VkNet.Enums.Filters;
 using VkNet.Model;
