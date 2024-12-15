@@ -16,18 +16,21 @@ namespace AutoVinchik
 
         public string Solve(string url)
         {
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("Решается капча...");
+
             string filename = $"{Directory.GetCurrentDirectory()}/captcha.png";
 
             WebClient webClient = new WebClient();
             webClient.DownloadFile(url, filename);
 
-            TwoCaptcha.TwoCaptcha solver = new TwoCaptcha.TwoCaptcha("da34f8f0683dc0553438e91f0cd435e6");
+            TwoCaptcha.TwoCaptcha solver = new TwoCaptcha.TwoCaptcha("");
             Normal captcha = new Normal(filename);
 
             try
             {
                 solver.Solve(captcha).Wait();
-                Console.WriteLine("Captcha solved: " + captcha.Code);
+                Console.WriteLine("Капча решена: " + captcha.Code);
             }
             catch (AggregateException e)
             {
