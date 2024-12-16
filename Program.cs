@@ -29,7 +29,7 @@ int count_YesMatch      = counts[2];
 int count_Total         = counts[3];
 int count_Repeat        = counts[4];
 
-List<long?> ids = File.ReadAllLines(@".\ids.txt").Select(a => Convert.ToInt64(a)).Cast<long?>().ToList();
+List<string> ids = File.ReadAllLines(@".\ids.txt").ToList();
 
 while (true)
 {
@@ -39,15 +39,23 @@ while (true)
     Console.ForegroundColor = ConsoleColor.White;
     Console.WriteLine(text);
 
-    if ((message.Attachments.Count != 0) && (ids.Contains(message.Attachments[0].Instance.Id)))
+    if ((message.Attachments.Count != 0) && (ids.Contains(((Photo)message.Attachments[0].Instance).Sizes[0].Url.OriginalString)))
     {
+        Pass();
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine("Повтор. Пропускаем.");
         count_Repeat++;
 
         continue;
     }
-    else if ((text.Contains('\n')) && (keywords.Any(text.ToLower().Contains)))  //(text.Contains('\n'))" - Пропускаем анкету, если описания нет вообще
+    else if (!text.Contains('\n'))  //Пропускаем анкету, если описания нет вообще
+    {
+        Pass();
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Нет описания");
+        count_NoDescription++;
+    } 
+    else if (keywords.Any(text.ToLower().Contains))
     {
         string keyword = "";
 
@@ -69,7 +77,7 @@ while (true)
 
         count_YesMatch++;
 
-        File.WriteAllLines(@".\ids.txt", ids.Select(a => a.ToString()));
+        File.WriteAllLines(@".\ids.txt", ids);
 
         File.WriteAllLines(
             @".\statistics.txt", 
@@ -77,31 +85,15 @@ while (true)
     }
     else
     {
-        MessagesSendParams messagesSendParams = new MessagesSendParams
-        {
-            Payload = "3",
-            Message = "👎",
-            PeerId = -91050183,
-            RandomId = Environment.TickCount64
-        };
-
-        vk.Messages.Send(messagesSendParams);
+        Pass();
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("Нет совпадения по ключевым словам");
-
-        if (!text.Contains('\n'))
-        {
-            count_NoDescription++;
-        }
-        else
-        {
-            count_NoMatch++;
-        }
+        count_NoMatch++;
     }
 
     if (message.Attachments.Count != 0)
     {
-        ids.Add(message.Attachments[0].Instance.Id);
+        ids.Add(((Photo)message.Attachments[0].Instance).Sizes[0].Url.OriginalString);
     }
 
     count_Total++;
@@ -113,6 +105,19 @@ while (true)
         $"Повтор: {count_Repeat}.";
 
     Thread.Sleep(1000);
+}
+
+void Pass()
+{
+    MessagesSendParams messagesSendParams = new MessagesSendParams
+    {
+        Payload = "3",
+        Message = "👎",
+        PeerId = -91050183,
+        RandomId = Environment.TickCount64
+    };
+
+    vk.Messages.Send(messagesSendParams);
 }
 
 Console.WriteLine("\r\nВсё");

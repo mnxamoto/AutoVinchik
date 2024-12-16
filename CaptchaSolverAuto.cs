@@ -16,6 +16,8 @@ namespace AutoVinchik
 
         public string Solve(string url)
         {
+            //https://rucaptcha.com
+
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine("Решается капча...");
 
@@ -24,7 +26,7 @@ namespace AutoVinchik
             WebClient webClient = new WebClient();
             webClient.DownloadFile(url, filename);
 
-            TwoCaptcha.TwoCaptcha solver = new TwoCaptcha.TwoCaptcha("");
+            TwoCaptcha.TwoCaptcha solver = new TwoCaptcha.TwoCaptcha("b3aded8eaa2f84c6e33651642f33d943");
             Normal captcha = new Normal(filename);
 
             try
